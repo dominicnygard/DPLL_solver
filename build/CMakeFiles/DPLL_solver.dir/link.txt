@@ -1,0 +1,1 @@
+/usr/bin/c++ -g CMakeFiles/DPLL_solver.dir/main.cpp.o -o DPLL_solver 
