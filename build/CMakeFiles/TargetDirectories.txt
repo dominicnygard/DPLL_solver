@@ -1,3 +1,0 @@
-/home/domi/Documents/development/DPLL_solver/build/CMakeFiles/DPLL_solver.dir
-/home/domi/Documents/development/DPLL_solver/build/CMakeFiles/edit_cache.dir
-/home/domi/Documents/development/DPLL_solver/build/CMakeFiles/rebuild_cache.dir

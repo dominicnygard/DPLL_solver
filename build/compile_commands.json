@@ -1,7 +1,0 @@
-[
-{
-  "directory": "/home/domi/Documents/development/DPLL_solver/build",
-  "command": "/usr/bin/c++   -g -o CMakeFiles/DPLL_solver.dir/main.cpp.o -c /home/domi/Documents/development/DPLL_solver/main.cpp",
-  "file": "/home/domi/Documents/development/DPLL_solver/main.cpp"
-}
-]
