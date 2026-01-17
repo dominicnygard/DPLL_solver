@@ -9,5 +9,5 @@ Projektin hallintaa varten käytetään cmake ja testit toteutetaan catch2 avull
 
 ## lähteet
 
-[Wikipedia: DPLL algorithm](https://en.wikipedia.org/wiki/DPLL_algorithm)
+[Wikipedia: DPLL algorithm](https://en.wikipedia.org/wiki/DPLL_algorithm)  
 [Aalto: Propositional satisfiability and SAT solvers](https://users.aalto.fi/~tjunttil/2020-DP-AUT/notes-sat/preprocessing.html)
