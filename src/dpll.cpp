@@ -1,5 +1,6 @@
 #include <dpll.h>
 #include <set>
+#include <algorithm>
 
 DPLL::DPLL(std::vector<Clause> clauses)
 {
@@ -27,7 +28,7 @@ bool DPLL::dpll_search()
 
         int unit = *u;
 
-        int var = abs(unit);
+        int var = std::abs(unit);
         bool value = unit > 0;
 
         if (assignment.contains(var)) {
@@ -45,7 +46,7 @@ bool DPLL::dpll_search()
     if (p.has_value()) {
         int pure = *p;
 
-        int var = abs(pure);
+        int var = std::abs(pure);
         int value = pure > 0;
 
         if (!assign(var, value))
@@ -109,7 +110,7 @@ std::optional<int> DPLL::find_pure_literal()
             continue;
 
         for (int literal : clauses[i].literals) {
-            int var = abs(literal);
+            int var = std::abs(literal);
             if (assignment.contains(var))
                 continue;
 
@@ -142,7 +143,7 @@ bool DPLL::assign(int var, bool value)
         bool clause_changed = false;
 
         for (int literal : clause.literals) {
-            if (abs(literal) != var)
+            if (std::abs(literal) != var)
                 continue;
 
             trail.emplace_back(TrailEntry{
@@ -209,7 +210,7 @@ std::optional<int> DPLL::choose_variable()
             continue;
 
         for (int literal : clauses[i].literals) {
-            int var = abs(literal);
+            int var = std::abs(literal);
             if (!assignment.contains(var))
                 var_counts[var] = var_counts.find(var) != var_counts.end() ? var_counts[var] + 1 : 1;
         }
