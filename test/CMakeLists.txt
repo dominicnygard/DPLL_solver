@@ -8,6 +8,9 @@ target_link_libraries(DPLL_tests
     DPLL_solver_lib
 )
 
+target_compile_options(DPLL_tests PRIVATE --coverage)
+target_link_options(DPLL_tests PRIVATE --coverage)
+
 list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 include(CTest)
 include(Catch)
