@@ -140,8 +140,6 @@ bool DPLL::assign(int var, bool value)
         if (clause.satisfied)
             continue;
 
-        bool clause_changed = false;
-
         for (int literal : clause.literals) {
             if (std::abs(literal) != var)
                 continue;
@@ -151,8 +149,6 @@ bool DPLL::assign(int var, bool value)
                 clause.satisfied,
                 clause.unassigned_count
             });
-
-            clause_changed = true;
 
             if ((literal > 0 && value) || (literal < 0 && !value)) {
                 clause.satisfied = true;
