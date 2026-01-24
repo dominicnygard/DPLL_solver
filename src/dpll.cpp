@@ -1,44 +1,5 @@
-#include <iostream>
-#include <vector>
+#include <dpll.h>
 #include <set>
-#include <unordered_map>
-#include <optional>
-#include <algorithm>
-
-struct Clause {
-    std::vector<int> literals;
-    int unassigned_count;
-    bool satisfied;
-};
-
-struct TrailEntry {
-    int clause_id;
-    bool prev_satisfied;
-    int prev_unassigned;
-};
-
-class DPLL {
-private:
-    std::vector<Clause> clauses;
-    int num_clauses = 0;
-    std::unordered_map<int, bool> assignment;
-    std::vector<TrailEntry> trail;
-    std::unordered_map<int, int> trail_markers;
-
-public:
-    DPLL(std::vector<Clause> clauses);
-    std::unordered_map<int, bool> solve();
-    bool dpll_search();
-    std::optional<int> find_unit_clause();
-    std::optional<int> find_pure_literal();
-    bool assign(int var, bool value);
-    void unassign(int var);
-    void undo_to_marker(int var);
-
-    std::optional<int> choose_variable();
-
-};
-
 
 DPLL::DPLL(std::vector<Clause> clauses)
 {
@@ -268,22 +229,3 @@ std::optional<int> DPLL::choose_variable()
 
     return std::nullopt;
 }
-
-int main(int argc, char *argv[]) {
-    std::vector<Clause> formulas;
-
-    formulas.emplace_back(Clause{std::vector<int>{1, 2}, 2, false});
-    formulas.emplace_back(Clause{std::vector<int>{-1, 3}, 2, false});
-    formulas.emplace_back(Clause{std::vector<int>{-2, -3}, 2, false});
-
-    DPLL dpll(formulas);
-    std::unordered_map<int, bool> result = dpll.solve();
-
-    for (auto it : result) {
-        std::cout << "key: " << it.first << " value: " << it.second << std::endl;
-    }
-
-    return 0;
-
-}
-
