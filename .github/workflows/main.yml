@@ -26,9 +26,10 @@ jobs:
           ctest --output-on-failure
       - name: Generate coverage report
         run: |
-          gcovr -r . \
+          gcovr -r ./src \
           --exclude '.*_deps.*' \
           --exclude '.*/build.*' \
+          --exclude '.*/test/.*' \
           --xml-pretty -o coverage.xml \
       - name: Upload report to Codecov
         uses: codecov/codecov-action@v5
