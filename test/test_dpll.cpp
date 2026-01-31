@@ -1,18 +1,70 @@
 #include <catch2/catch_all.hpp>
-#include "dpll.h"
+#include <solver.h>
 
 TEST_CASE("DPLL solver returns correct answer") {
-    std::vector<Clause> formulas;
+    CNF cnf;
 
-    formulas.emplace_back(Clause{std::vector<int>{1, -2}, 2, false});
-    formulas.emplace_back(Clause{std::vector<int>{2, 3}, 2, false});
-    formulas.emplace_back(Clause{std::vector<int>{-1, -3}, 2, false});
+    cnf.num_vars = 3;
+    cnf.clauses = {
+        {{1, -2}, 0, 1},
+        {{2, 3}, 0, 1},
+        {{-1, -3}, 0, 1}
+    };
 
-    DPLL dpll(formulas);
-    std::unordered_map<int, bool> result = dpll.solve();
+    Solver dpll(cnf);
+    bool result = dpll.solve();
 
-    REQUIRE(!result.empty());
-    REQUIRE(result[1] == false);
-    REQUIRE(result[2] == false);
-    REQUIRE(result[3] == true);
+    REQUIRE(result);
+
+    std::vector<int> assignment = dpll.get_assignment();
+
+    REQUIRE(assignment[0] == true);
+    REQUIRE(assignment[1] == true);
+    REQUIRE(assignment[2] == false);
 }
+
+TEST_CASE("DPLL solver handles unsatisfiable CNF") {
+    CNF cnf;
+    cnf.num_vars = 3;
+    cnf.clauses = {
+        {{1, 2}, 0, 1},
+        {{-1}, 0, -1},
+        {{-2}, 0, -1},
+        {{3}, 0, 1},
+        {{-3}, 0, -1}
+    };
+    Solver dpll(cnf);
+    bool result = dpll.solve();
+    REQUIRE_FALSE(result);
+}
+
+TEST_CASE("DPLL solver handles 4-variable CNF with multiple solutions") {
+    CNF cnf;
+    cnf.num_vars = 4;
+    cnf.clauses = {
+        {{1, 2}, 0, 1},
+        {{-1, 3}, 0, 1},
+        {{-2, 4}, 0, 1},
+        {{-3, -4}, 0, 1}
+    };
+    Solver dpll(cnf);
+    bool result = dpll.solve();
+    REQUIRE(result);
+    std::vector<int> assignment = dpll.get_assignment();
+    REQUIRE((assignment[0] == true || assignment[1] == true));
+}
+
+/*
+TEST_CASE("DPLL solver handles pigeonhole principle (unsat)") {
+    CNF cnf;
+    cnf.num_vars = 3;
+    cnf.clauses = {
+        {{1, 2}, 0, 1},  
+        {{3, 4}, 0, 1},  
+        {{-1, -3}, 0, 1}, 
+        {{-2, -4}, 0, 1}  
+    };
+    Solver dpll(cnf);
+    bool result = dpll.solve();
+    REQUIRE_FALSE(result);
+}*/

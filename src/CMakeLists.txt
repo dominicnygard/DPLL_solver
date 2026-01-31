@@ -1,5 +1,7 @@
 set(LIB_SOURCES
-    dpll.cpp
+    solver.cpp
+    parser.cpp
+    dpll_io.cpp
 )
 
 add_library(DPLL_solver_lib ${LIB_SOURCES})

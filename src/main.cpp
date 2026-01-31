@@ -1,19 +1,11 @@
-#include <iostream>
-#include "dpll.h"
+#include <dpll_io.h>
 
-int main(int argc, char *argv[]) {
-    std::vector<Clause> formulas;
-
-    formulas.emplace_back(Clause{std::vector<int>{1, 2}, 2, false});
-    formulas.emplace_back(Clause{std::vector<int>{-1, 3}, 2, false});
-    formulas.emplace_back(Clause{std::vector<int>{-2, -3}, 2, false});
-
-    DPLL dpll(formulas);
-    std::unordered_map<int, bool> result = dpll.solve();
-
-    for (auto it : result) {
-        std::cout << "key: " << it.first << " value: " << it.second << std::endl;
+int main(int argc, char** argv) {
+    if (argc < 2) {
+        std::cerr << "Usage: " << argv[0] << " <inputfile>\n";
+        return 1;
     }
+    io::solve(std::filesystem::path(argv[1]));
 
     return 0;
 }
