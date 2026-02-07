@@ -32,6 +32,8 @@ bool Solver::solve()
     backtrack.push_back(var + 1);
     assignment[var] = 1;
 
+    runtime_stats.decisions++;
+
     if (solve())
         return true;
 
@@ -97,8 +99,14 @@ std::vector<int> Solver::get_assignment()
     return assignment;
 }
 
+Stats Solver::get_stats()
+{
+    return runtime_stats;
+}
+
 bool Solver::propagate()
 {
+    runtime_stats.propagations++;
     while (propagate_idx < backtrack.size()) {
         int l = backtrack[propagate_idx++];
         int false_literal = -l;
@@ -142,6 +150,7 @@ bool Solver::propagate()
                     assignment[other_watch_variable] = (unit_literal > 0) ? 1 : 0;
                     backtrack.push_back(unit_literal);
                 } else if (assignment[other_watch_variable] != (clause.literals[other_watch_index] > 0)) {
+                    runtime_stats.backtracks++;
                     return false;
                 }
                 idx++;

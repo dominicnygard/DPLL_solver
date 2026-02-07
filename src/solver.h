@@ -11,13 +11,15 @@ private:
     std::vector<int> assignment;
     int num_variables = 0;
     size_t propagate_idx = 0;
-
+    Stats runtime_stats;
+    
 public:
     Solver(CNF clauses);
     bool solve();
     bool propagate();
     void set_watches();
     std::vector<int> get_assignment();
+    Stats get_stats();
 };
 
 #endif

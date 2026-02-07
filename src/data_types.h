@@ -2,6 +2,7 @@
 #define DATA_TYPES_H
 
 #include <vector>
+#include <cstdint>
 
 struct Clause {
     std::vector<int> literals;
@@ -11,6 +12,12 @@ struct Clause {
 struct CNF {
     int num_vars;
     std::vector<Clause> clauses;
+};
+
+struct Stats {
+    uint64_t decisions = 0;
+    uint64_t propagations = 0;
+    uint64_t backtracks = 0;
 };
 
 #endif
