@@ -17,6 +17,7 @@ Algoritmit ja tekoäly -harjoitustyönä tehty DPLL ratkaisija.
 [Viikkoraportti 2](https://github.com/dominicnygard/DPLL_solver/blob/main/docs/viikkoraportti2.md)  
 [Viikkoraportti 3](https://github.com/dominicnygard/DPLL_solver/blob/main/docs/viikkoraportti3.md)  
 [Viikkoraportti 4](https://github.com/dominicnygard/DPLL_solver/blob/main/docs/viikkoraportti4.md)
+[Viikkoraportti 5](https://github.com/dominicnygard/DPLL_solver/blob/main/docs/viikkoraportti5.md)
 
 ## Käyttö ohjeet
 

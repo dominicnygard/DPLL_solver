@@ -10,6 +10,36 @@ Solver::Solver(CNF clauses)
     set_watches();
 }
 
+/*
+ *  Funktio toimii, niin että
+ * 
+ * Se kutsuu propagate() ja suorittaa yksikköpropagoinnin.
+ * Jos konflikti löytyy, backtrack. 
+ * 
+ * Sen jälkeen tarkistetaan, ovatko kaikki muuttujat asetettu (var == -1).
+ * Jos kyllä: löytyi ratkaisu, palauta true.
+ * Jos ei: valitse seuraava vapaa muuttuja.
+ *
+ * Tämän jälkeen Tehdään päätöksen: yrittää ensin arvoa true (var + 1 = positive literal).
+ * Tallentaa tämänhetkisen backtrack ja propagate_idx tilan.
+ * Asettaa assignment[var] = 1 ja lisää (var + 1) backtrackiin.
+ * Kutsuu recursively solve().
+ * Jos recursive kutsu palauttaa true, niin löytyi ratkaisu, palauta true.
+ *
+ * Jos ykkönen ei johtanut ratkaisuun:
+ * Kumoa päätös ja poista backtrack-jonosta kaikki mitä lisättiin,
+ * aseta assignment[var] = -1, palauta propagate_idx.
+ *
+ * Sitten yritetään toista arvoa (arvoa false = -(var + 1) = negative literal).
+ * Samalla logiikalla kuin ennen.
+ * Jos tämä toimii, palauta true.
+ *
+ * Jos molemmat arvot epäonnistuvat:
+ * Kumoa toinen päätös kuten kohdassa 4.
+ * Palauta false (ei ratkaisua tällä haaralla).
+ *
+ * Lopuksi palauttaa true jos löytyi tyydyttävä sijoitus, false jos ei löytynyt.
+ */
 bool Solver::solve()
 {
     if (!propagate())
@@ -67,12 +97,17 @@ int literal_id(int literal) {
     return 2 * variable + sign;
 }
 
+/* Laitetaan kaikki watches watch listaa */
 void Solver::set_watches() {
     watch_list.resize(2 * num_variables);
-    //std::cout << watch_list.size() << '\n';
     assignment.resize(num_variables);
     fill(assignment.begin(), assignment.end(), -1);
 
+    /* 
+     * Mennään kaikki klausuulien läpi ja laitetaan ensinmäinen ja toinen literaali
+     * watch, käytetään indeksi tähän, jos on ainoastaan yksi literaali klausuulissa, niiin
+     * asennetaan ensinmäinen watch olemaan se ja toinen watch on -1.
+    */
     for (int cid = 0; cid < clauses.size(); cid++) {
         Clause& c = clauses[cid];
 
@@ -104,6 +139,30 @@ Stats Solver::get_stats()
     return runtime_stats;
 }
 
+/*
+ *
+ * Algoritmin periaate:
+ * - Jokaisella lauseella on kaksi "watchia", indeksit watch1 ja watch2.
+ * - watch_list[wid] sisältää listan kaikista lauseista, jotka tällä hetkellä 
+ *   seuraavat (watchaavat) literaalia wid. Useilla lauseilla voi olla sama watched-literal.
+ * - Kun muuttuja saa arvon, sen vastaluku tulee prosessoida.
+ *
+ * Pääsilmukan toiminta:
+ * 1. Otetaan seuraava literal backtrack-jonosta.
+ * 2. Haetaan kaikki lauseet, jotka watchaavat kyseisen literaalin vastalukua.
+ * 3. Jokaiselle lauseelle yritetään siirtää watch:
+ *    - Etsitään muu literaali, joka on true tai unassigned.
+ *    - Jos löytyy, siirretään watch siihen ja poistetaan lauseen ID nykyisestä
+ *      watch-listasta
+ *    - Tämän vuoksi emme inkrementoi idx:ää, koska swap toi paikalle uuden elementin.
+ * 4. Jos watchia ei voida siirtää elikä kaikki muut literaalit false:
+ *    - Tarkistetaan toisen watchin tila:
+ *      * Jos unassigned: tämä on unit clause -> asetetaan arvo ja lisätään backtrack-jonoon.
+ *      * Jos false: palautetaan false -> backtrack vaaditaan.
+ *      * Jos true: jatketaan seuraavaan lauseeseen.
+ *
+ * Lopuksi: palautta true jos ei konflikti, false jos konflikti löytyi.
+ */
 bool Solver::propagate()
 {
     runtime_stats.propagations++;
