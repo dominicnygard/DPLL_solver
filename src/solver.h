@@ -18,8 +18,10 @@ public:
     bool solve();
     bool propagate();
     void set_watches();
+    void pure_literal_elimination();
     std::vector<int> get_assignment();
     Stats get_stats();
+    size_t get_num_clauses();
 };
 
 #endif

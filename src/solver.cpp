@@ -7,6 +7,12 @@ Solver::Solver(CNF clauses)
 {
     this->clauses = std::move(clauses.clauses);
     num_variables = clauses.num_vars;
+    
+    assignment.resize(num_variables);
+    fill(assignment.begin(), assignment.end(), -1);
+    
+    pure_literal_elimination();
+    
     set_watches();
 }
 
@@ -97,11 +103,9 @@ int literal_id(int literal) {
     return 2 * variable + sign;
 }
 
-/* Laitetaan kaikki watches watch listaa */
+/* Laitetaan kaikki watches watch listaan */
 void Solver::set_watches() {
     watch_list.resize(2 * num_variables);
-    assignment.resize(num_variables);
-    fill(assignment.begin(), assignment.end(), -1);
 
     /* 
      * Mennään kaikki klausuulien läpi ja laitetaan ensinmäinen ja toinen literaali
@@ -139,6 +143,66 @@ Stats Solver::get_stats()
     return runtime_stats;
 }
 
+size_t Solver::get_num_clauses()
+{
+    return clauses.size();
+}
+
+/*
+ * Puhtaan literaalin eliminaatio toimii, niin että
+ * puhtas literaali on muuttuja joka esintyy ainoastaan positiivina tai negatiivina.
+ * Jos literaali on puhdas voidaan tyydyttää kaikki klausuulit jotka sisältävät literaalin.
+ */
+void Solver::pure_literal_elimination()
+{
+    std::vector<bool> appears_positive(num_variables, false);
+    std::vector<bool> appears_negative(num_variables, false);
+    
+    for (const auto& clause : clauses) {
+        for (int literal : clause.literals) {
+            int var = abs(literal) - 1;
+            if (literal > 0) {
+                appears_positive[var] = true;
+            } else {
+                appears_negative[var] = true;
+            }
+        }
+    }
+    
+    for (int var = 0; var < num_variables; var++) {
+        if (assignment[var] != -1) {
+            continue;
+        }
+        
+        bool is_positive = appears_positive[var];
+        bool is_negative = appears_negative[var];
+        
+        if (is_positive && !is_negative) {
+            assignment[var] = 1;
+            backtrack.push_back(var + 1);
+        } else if (is_negative && !is_positive) {
+            assignment[var] = 0;
+            backtrack.push_back(-(var + 1));
+        }
+    }
+    
+    auto new_end = std::remove_if(clauses.begin(), clauses.end(),
+        [this](const Clause& clause) {
+            for (int literal : clause.literals) {
+                int var = abs(literal) - 1;
+                if (assignment[var] != -1) {
+                    bool literal_value = (literal > 0) ? (assignment[var] == 1) : (assignment[var] == 0);
+                    if (literal_value) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        });
+    clauses.erase(new_end, clauses.end());
+}
+
+
 /*
  *
  * Algoritmin periaate:
@@ -161,7 +225,7 @@ Stats Solver::get_stats()
  *      * Jos false: palautetaan false -> backtrack vaaditaan.
  *      * Jos true: jatketaan seuraavaan lauseeseen.
  *
- * Lopuksi: palautta true jos ei konflikti, false jos konflikti löytyi.
+ * Lopuksi palauttaa true jos ei konflikti, false jos konflikti löytyi.
  */
 bool Solver::propagate()
 {

@@ -105,3 +105,118 @@ TEST_CASE("Unit propagation detects conflict") {
     bool result = dpll.solve();
     REQUIRE_FALSE(result);
 }
+
+TEST_CASE("Pure literal elimination - single positive pure literal") {
+    CNF cnf;
+    cnf.num_vars = 3;
+    cnf.clauses = {
+        {{1, 2}, 0, 1},
+        {{1, -2}, 0, 1},
+        {{2, 3}, 0, 1},
+        {{-2, 3}, 0, 1}
+    };
+    
+    Solver solver(cnf);
+    
+    std::vector<int> assignment = solver.get_assignment();
+    
+    REQUIRE(assignment[0] == 1);
+    REQUIRE(assignment[2] == 1);
+    REQUIRE(solver.get_num_clauses() == 0);
+}
+
+TEST_CASE("Pure literal elimination - single negative pure literal") {
+    CNF cnf;
+    cnf.num_vars = 3;
+    cnf.clauses = {
+        {{-1, 2}, 0, 1},
+        {{-1, -2}, 0, 1},
+        {{2, -3}, 0, 1},
+        {{-2, 3}, 0, 1}
+    };
+    
+    Solver solver(cnf);
+    
+    std::vector<int> assignment = solver.get_assignment();
+    REQUIRE(assignment[0] == 0);
+    REQUIRE(solver.get_num_clauses() == 2);
+}
+
+TEST_CASE("Pure literal elimination - mixed polarities not eliminated") {
+    CNF cnf;
+    cnf.num_vars = 3;
+    cnf.clauses = {
+        {{1, -2}, 0, 1},
+        {{-1, 2}, 0, 1},
+        {{3}, 0, -1},
+        {{-2, 3}, 0, 1}
+    };
+    
+    Solver solver(cnf);
+    
+    std::vector<int> assignment = solver.get_assignment();
+    
+    REQUIRE(assignment[0] == -1);
+    REQUIRE(assignment[1] == -1);
+    REQUIRE(assignment[2] == 1);
+    REQUIRE(solver.get_num_clauses() == 2);
+}
+
+TEST_CASE("Pure literal elimination - all variables pure") {
+    CNF cnf;
+    cnf.num_vars = 3;
+    cnf.clauses = {
+        {{1, 2}, 0, 1},
+        {{1, 3}, 0, 1},
+        {{2, 3}, 0, 1}
+    };
+    
+    Solver solver(cnf);
+    
+    std::vector<int> assignment = solver.get_assignment();
+    
+    REQUIRE(assignment[0] == 1);
+    REQUIRE(assignment[1] == 1);
+    REQUIRE(assignment[2] == 1);
+    REQUIRE(solver.get_num_clauses() == 0);
+}
+
+TEST_CASE("Pure literal elimination - simplifies problem") {
+    CNF cnf;
+    cnf.num_vars = 4;
+    cnf.clauses = {
+        {{1, 2, 3}, 0, 2},
+        {{1, -2, 4}, 0, 2},
+        {{-2, 3}, 0, 1},
+        {{2, -3}, 0, 1}
+    };
+    
+    Solver solver(cnf);
+    
+    std::vector<int> assignment = solver.get_assignment();
+    
+    REQUIRE(assignment[0] == 1);
+    REQUIRE(assignment[3] == 1);
+    REQUIRE(assignment[1] == -1);
+    REQUIRE(assignment[2] == -1);
+    REQUIRE(solver.get_num_clauses() == 2);
+}
+
+TEST_CASE("Pure literal elimination - no pure literals") {
+    CNF cnf;
+    cnf.num_vars = 2;
+    cnf.clauses = {
+        {{1, 2}, 0, 1},
+        {{-1, -2}, 0, 1},
+        {{1, -2}, 0, 1},
+        {{-1, 2}, 0, 1}
+    };
+    
+    Solver solver(cnf);
+    
+    std::vector<int> assignment = solver.get_assignment();
+    
+    REQUIRE(assignment[0] == -1);
+    REQUIRE(assignment[1] == -1);
+    REQUIRE(solver.get_num_clauses() == 4);
+}
