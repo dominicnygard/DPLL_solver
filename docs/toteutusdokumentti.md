@@ -51,3 +51,13 @@ Kun käytän suorituskyky testiä joka käyttää sat ongelma tiedostossa prime4
 ### parannukset
 
 Ohjelman voisi muuttamalla algoritmia CDCL algoritmiksi parantaa. Ohjelma voisi vielä myös optimoida.
+
+## Tekoälyn käyttö
+
+Projektiin ei ole käytetty tekoälyä.
+
+## Lähteet
+
+https://en.wikipedia.org/wiki/DPLL_algorithm  
+https://users.aalto.fi/~tjunttil/2020-DP-AUT/notes-sat/dpll.html  
+https://haz-tech.blogspot.com/2010/08/whos-watching-watch-literals.html?m=1
